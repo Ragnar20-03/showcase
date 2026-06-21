@@ -35,8 +35,10 @@ function TypingText({ texts }: { texts: string[] }) {
     } else if (deleting && displayed.length > 0) {
       timeout = setTimeout(() => setDisplayed(displayed.slice(0, -1)), 30);
     } else if (deleting && displayed.length === 0) {
-      setDeleting(false);
-      setIndex((i) => (i + 1) % texts.length);
+      timeout = setTimeout(() => {
+        setDeleting(false);
+        setIndex((i) => (i + 1) % texts.length);
+      }, 0);
     }
 
     return () => clearTimeout(timeout);
@@ -57,7 +59,7 @@ export default function Hero() {
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-600/8 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-900/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 bg-violet-900/5 rounded-full blur-3xl" />
       </div>
 
       {/* Grid overlay */}
@@ -107,7 +109,7 @@ export default function Hero() {
         <motion.div variants={fadeUp} className="flex flex-wrap gap-4 justify-center mb-20">
           <a
             href="#projects"
-            className="px-7 py-3 rounded-xl font-semibold text-sm bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white shadow-lg shadow-violet-900/30 hover:shadow-violet-900/50 transition-all duration-300 hover:-translate-y-0.5"
+            className="px-7 py-3 rounded-xl font-semibold text-sm bg-linear-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white shadow-lg shadow-violet-900/30 hover:shadow-violet-900/50 transition-all duration-300 hover:-translate-y-0.5"
           >
             View Projects
           </a>
@@ -143,7 +145,7 @@ export default function Hero() {
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-px h-8 bg-gradient-to-b from-violet-500/50 to-transparent"
+          className="w-px h-8 bg-linear-to-b from-violet-500/50 to-transparent"
         />
       </motion.div>
     </section>
