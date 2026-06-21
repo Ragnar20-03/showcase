@@ -44,46 +44,14 @@ const experiences = [
 
 const evolution = [
   {
-    layer: "AI & Agents",
-    period: "2025 — Now",
-    color: "border-violet-500",
-    bg: "bg-violet-500/10",
-    dot: "bg-violet-400",
-    textColor: "text-violet-300",
-    skills: ["LLM APIs", "RAG", "AI Agents", "n8n", "Agentforce", "Prompt Eng", "Vector DBs"],
-    desc: "Building intelligent systems — the primary focus",
-    highlight: true,
-  },
-  {
-    layer: "Salesforce Platform",
-    period: "2026",
-    color: "border-blue-500",
-    bg: "bg-blue-500/10",
-    dot: "bg-blue-400",
-    textColor: "text-blue-300",
-    skills: ["Apex", "LWC", "SOQL", "Flows", "REST Integration", "Einstein AI"],
-    desc: "Professional platform engineering",
-    highlight: true,
-  },
-  {
-    layer: "Web3 / Blockchain",
-    period: "2025",
-    color: "border-orange-500",
-    bg: "bg-orange-500/8",
-    dot: "bg-orange-400",
-    textColor: "text-orange-300",
-    skills: ["Solana", "Anchor", "Smart Contracts", "DeFi", "SPL Tokens"],
-    desc: "On-chain application development",
-  },
-  {
-    layer: "Full Stack & Cloud",
-    period: "2023 — 2025",
-    color: "border-emerald-500",
-    bg: "bg-emerald-500/8",
-    dot: "bg-emerald-400",
-    textColor: "text-emerald-300",
-    skills: ["Next.js", "React", "Node.js", "Docker", "AWS", "CI/CD", "MongoDB", "PostgreSQL"],
-    desc: "End-to-end product development",
+    layer: "CS Foundation",
+    period: "2023",
+    color: "border-white/20",
+    bg: "bg-white/3",
+    dot: "bg-white/40",
+    textColor: "text-white/40",
+    skills: ["C", "C++", "Java", "Data Structures", "Algorithms", "OS", "DBMS", "Networking"],
+    desc: "Where it all started",
   },
   {
     layer: "Systems & DevOps",
@@ -96,14 +64,46 @@ const evolution = [
     desc: "Low-level systems and infrastructure",
   },
   {
-    layer: "CS Foundation",
-    period: "2023",
-    color: "border-white/20",
-    bg: "bg-white/3",
-    dot: "bg-white/40",
-    textColor: "text-white/40",
-    skills: ["C", "C++", "Java", "Data Structures", "Algorithms", "OS", "DBMS", "Networking"],
-    desc: "Where it all started",
+    layer: "Full Stack & Cloud",
+    period: "2023 — 2025",
+    color: "border-emerald-500",
+    bg: "bg-emerald-500/8",
+    dot: "bg-emerald-400",
+    textColor: "text-emerald-300",
+    skills: ["Next.js", "React", "Node.js", "Docker", "AWS", "CI/CD", "MongoDB", "PostgreSQL"],
+    desc: "End-to-end product development",
+  },
+  {
+    layer: "Web3 / Blockchain",
+    period: "2025",
+    color: "border-orange-500",
+    bg: "bg-orange-500/8",
+    dot: "bg-orange-400",
+    textColor: "text-orange-300",
+    skills: ["Solana", "Anchor", "Smart Contracts", "DeFi", "SPL Tokens"],
+    desc: "On-chain application development",
+  },
+  {
+    layer: "Salesforce Platform",
+    period: "2025 — 2026",
+    color: "border-blue-500",
+    bg: "bg-blue-500/10",
+    dot: "bg-blue-400",
+    textColor: "text-blue-300",
+    skills: ["Apex", "LWC", "SOQL", "Flows", "REST Integration", "Einstein AI"],
+    desc: "Professional platform engineering",
+    highlight: true,
+  },
+  {
+    layer: "AI & Agents",
+    period: "2025 — Now",
+    color: "border-violet-500",
+    bg: "bg-violet-500/10",
+    dot: "bg-violet-400",
+    textColor: "text-violet-300",
+    skills: ["LLM APIs", "RAG", "AI Agents", "n8n", "Agentforce", "Prompt Eng", "Vector DBs"],
+    desc: "Building intelligent systems — the primary focus",
+    highlight: true,
   },
 ];
 
@@ -176,7 +176,7 @@ export default function Experience() {
                   </div>
                 </div>
 
-                <div className="flex flex-col-reverse gap-2">
+                <div className="flex flex-col gap-2">
                   {evolution.map((layer, i) => (
                     <motion.div
                       key={layer.layer}
@@ -210,7 +210,7 @@ export default function Experience() {
                 </div>
 
                 <p className="text-[10px] text-white/15 mt-4 text-center">
-                  ↑ current focus &nbsp;·&nbsp; foundation ↓
+                  foundation ↑ &nbsp;·&nbsp; current focus ↓
                 </p>
               </div>
             </motion.div>
