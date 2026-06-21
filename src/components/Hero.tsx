@@ -99,7 +99,8 @@ export default function Hero() {
           Salesforce Developer turned AI Engineer. Building intelligent agents,
           RAG pipelines, and AI-powered Salesforce solutions — targeting{" "}
           <span className="text-violet-400">FDE</span> and{" "}
-          <span className="text-blue-400">Salesforce AI</span> roles.
+          <span className="text-blue-400">Salesforce</span>{" "}+{" "}
+          <span className="text-violet-400">AI</span> roles.
         </motion.p>
 
         {/* CTAs */}
