@@ -1,0 +1,12 @@
+{
+  "languages": ["TypeScript", "JavaScript", "Python", "C++", "C", "Java", "Apex"],
+  "frontend": ["React", "Next.js", "Angular", "Tailwind CSS", "React Native"],
+  "backend": ["Node.js", "Express.js"],
+  "blockchain": ["Solana", "Web3.js", "Anchor Framework"],
+  "databases": ["MongoDB", "PostgreSQL"],
+  "salesforce": ["Apex", "LWC (Lightning Web Components)", "Salesforce Platform", "Agentforce"],
+  "ai_ml": ["LLM APIs", "RAG Pipelines", "AI Agents", "n8n Automation", "Python"],
+  "cloud_devops": ["AWS", "Docker", "Linux"],
+  "tools": ["Git", "Docker", "Linux"],
+  "currently_learning": ["Python", "LLM APIs", "RAG", "AI Agents", "AWS"]
+}

@@ -1,0 +1,105 @@
+[
+  {
+    "order": 1,
+    "name": "Decentralized Exchange",
+    "repo": "decentralized-exhange",
+    "description": "A Decentralized Exchange for Solana tokens",
+    "github_url": "https://github.com/Ragnar20-03/decentralized-exhange",
+    "tech_stack": ["TypeScript", "Solana", "Web3.js", "React"],
+    "category": "Web3 / Blockchain",
+    "featured": true
+  },
+  {
+    "order": 2,
+    "name": "On-Chain TicTacToe",
+    "repo": "on-chain-ox",
+    "description": "Decentralized TicTacToe game running fully on-chain",
+    "github_url": "https://github.com/Ragnar20-03/on-chain-ox",
+    "tech_stack": ["TypeScript", "Solana", "Anchor", "React"],
+    "category": "Web3 / Blockchain",
+    "featured": true
+  },
+  {
+    "order": 3,
+    "name": "EduCred",
+    "repo": "educred",
+    "description": "Reputation coin system for education",
+    "github_url": "https://github.com/Ragnar20-03/educred",
+    "tech_stack": ["TypeScript", "Blockchain", "React"],
+    "category": "Web3 / Blockchain",
+    "featured": true
+  },
+  {
+    "order": 4,
+    "name": "Whisper",
+    "repo": "Whisper",
+    "description": "Real-time chat application",
+    "github_url": "https://github.com/Ragnar20-03/Whisper",
+    "tech_stack": ["TypeScript", "WebSocket", "Node.js", "React"],
+    "category": "Full Stack",
+    "featured": true,
+    "stars": 1
+  },
+  {
+    "order": 5,
+    "name": "Minimi",
+    "repo": "Minimi",
+    "description": "A Social Media Platform",
+    "github_url": "https://github.com/Ragnar20-03/Minimi",
+    "tech_stack": ["JavaScript", "Node.js", "MongoDB", "React"],
+    "category": "Full Stack",
+    "featured": true,
+    "stars": 1
+  },
+  {
+    "order": 6,
+    "name": "Chess.com Replica",
+    "repo": "Chess.com",
+    "description": "Online Chess game — replica of Chess.com with real-time multiplayer",
+    "github_url": "https://github.com/Ragnar20-03/Chess.com",
+    "tech_stack": ["TypeScript", "WebSocket", "React", "Node.js"],
+    "category": "Full Stack",
+    "featured": true
+  },
+  {
+    "order": 7,
+    "name": "Omegle Clone",
+    "repo": "Omegle",
+    "description": "WebRTC-based random video chat app",
+    "github_url": "https://github.com/Ragnar20-03/Omegle",
+    "tech_stack": ["TypeScript", "WebRTC", "Node.js", "React"],
+    "category": "Full Stack",
+    "featured": true
+  },
+  {
+    "order": 8,
+    "name": "GarageKeeperX",
+    "repo": "GarageKeeperX",
+    "description": "Garage management platform",
+    "github_url": "https://github.com/Ragnar20-03/GarageKeeperX",
+    "tech_stack": ["TypeScript", "Next.js", "Node.js"],
+    "category": "Full Stack",
+    "featured": false
+  },
+  {
+    "order": 9,
+    "name": "The Restaurant App",
+    "repo": "The-Restaurant-App",
+    "description": "Full stack restaurant app built with MEAN Stack",
+    "github_url": "https://github.com/Ragnar20-03/The-Restaurant-App",
+    "tech_stack": ["TypeScript", "Angular", "Node.js", "MongoDB"],
+    "category": "Full Stack",
+    "featured": false,
+    "stars": 1
+  },
+  {
+    "order": 10,
+    "name": "Solana Token Launchpad",
+    "repo": "solana-token-launchpad",
+    "description": "Launch your own Solana tokens with this launchpad",
+    "github_url": "https://github.com/Ragnar20-03/solana-token-launchpad",
+    "tech_stack": ["TypeScript", "Solana", "React"],
+    "category": "Web3 / Blockchain",
+    "featured": false
+  }
+]
