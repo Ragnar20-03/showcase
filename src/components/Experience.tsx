@@ -6,7 +6,7 @@ import { fadeUp, slideLeft, stagger, viewportConfig } from "@/lib/animations";
 const experiences = [
   {
     role: "Salesforce Developer",
-    company: "Skillsmind LLP — Nashik",
+    company: "Skillminds LLP — Nashik",
     period: "2025 — Present · 1 yr",
     current: true,
     description: [
