@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { fadeUp, slideLeft, slideRight, stagger, viewportConfig } from "@/lib/animations";
+import { slideLeft, slideRight, stagger, viewportConfig } from "@/lib/animations";
 
 const journey = [
   { icon: "🎓", label: "CS Foundation", desc: "C, C++, Java, Data Structures, OS, DBMS" },
