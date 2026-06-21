@@ -4,12 +4,12 @@ import { motion } from "framer-motion";
 import { slideLeft, slideRight, stagger, viewportConfig } from "@/lib/animations";
 
 const journey = [
-  { icon: "🎓", label: "CS Foundation", desc: "C, C++, Java, Linux, Kernel Modules, Device Drivers, OS, DBMS" },
-  { icon: "🧩", label: "Problem Solving", desc: "300+ LeetCode solved · Ninja Dominator on Coding Ninjas" },
-  { icon: "⚡", label: "Full Stack", desc: "MERN, MEAN, Next.js, TypeScript, WebRTC, WebSockets" },
-  { icon: "🔗", label: "Web3 / Blockchain", desc: "Solana, Anchor, DEX, On-chain apps, DeFi" },
-  { icon: "☁️", label: "Salesforce", desc: "Apex, LWC, Agentforce, Einstein AI — 1 year professional exp" },
   { icon: "🤖", label: "AI Engineering", desc: "LLMs, RAG, AI Agents, n8n, Vector DBs, Prompt Engineering" },
+  { icon: "☁️", label: "Salesforce", desc: "Apex, LWC, Agentforce, Einstein AI — 1 year professional exp" },
+  { icon: "🔗", label: "Web3 / Blockchain", desc: "Solana, Anchor, DEX, On-chain apps, DeFi" },
+  { icon: "⚡", label: "Full Stack", desc: "MERN, MEAN, Next.js, TypeScript, WebRTC, WebSockets" },
+  { icon: "🧩", label: "Problem Solving", desc: "300+ LeetCode solved · Ninja Dominator on Coding Ninjas" },
+  { icon: "🎓", label: "CS Foundation", desc: "C, C++, Java, Linux, Kernel Modules, Device Drivers, OS, DBMS" },
 ];
 
 export default function About() {
