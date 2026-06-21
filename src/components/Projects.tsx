@@ -125,9 +125,9 @@ const projects: Project[] = [
 
 const tabs = [
   { id: "all", label: "All" },
+  { id: "ai", label: "AI / ML" },
   { id: "web3", label: "Web3 / Blockchain" },
   { id: "fullstack", label: "Full Stack" },
-  { id: "ai", label: "AI / ML" },
 ] as const;
 
 type TabId = typeof tabs[number]["id"];

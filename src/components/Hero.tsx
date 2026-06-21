@@ -7,16 +7,16 @@ import { stagger, fadeUp } from "@/lib/animations";
 const roles = [
   "Forward Deployed Engineer",
   "AI Solutions Engineer",
-  "Salesforce Developer",
-  "Full Stack Developer",
-  "Web3 Builder",
+  "Salesforce AI Developer",
+  "AI Integration Engineer",
+  "AI Agent Builder",
 ];
 
 const stats = [
   { value: "63+", label: "GitHub Repos" },
-  { value: "6mo", label: "Salesforce Exp" },
-  { value: "6+", label: "Web3 Projects" },
-  { value: "10+", label: "Full Stack Apps" },
+  { value: "300+", label: "LeetCode Solved" },
+  { value: "10+", label: "Web3 Projects" },
+  { value: "Ninja", label: "Dominator — CN" },
 ];
 
 function TypingText({ texts }: { texts: string[] }) {
@@ -96,11 +96,10 @@ export default function Hero() {
 
         {/* Tagline */}
         <motion.p variants={fadeUp} className="text-base sm:text-lg text-white/40 max-w-xl mx-auto mb-10 leading-relaxed">
-          Salesforce Developer leveling up into AI Engineering.
-          Building at the intersection of{" "}
-          <span className="text-violet-400">AI</span>,{" "}
-          <span className="text-orange-400">Web3</span>, and{" "}
-          <span className="text-blue-400">Full Stack</span>.
+          Salesforce Developer turned AI Engineer. Building intelligent agents,
+          RAG pipelines, and AI-powered Salesforce solutions — targeting{" "}
+          <span className="text-violet-400">FDE</span> and{" "}
+          <span className="text-blue-400">Salesforce AI</span> roles.
         </motion.p>
 
         {/* CTAs */}

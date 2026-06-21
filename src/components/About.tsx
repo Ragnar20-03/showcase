@@ -4,11 +4,12 @@ import { motion } from "framer-motion";
 import { slideLeft, slideRight, stagger, viewportConfig } from "@/lib/animations";
 
 const journey = [
-  { icon: "🎓", label: "CS Foundation", desc: "C, C++, Java, Data Structures, OS, DBMS" },
-  { icon: "⚡", label: "Full Stack", desc: "MERN, MEAN, Next.js, TypeScript, WebRTC" },
-  { icon: "🔗", label: "Web3", desc: "Solana, Anchor, DEX, On-chain apps" },
-  { icon: "☁️", label: "Salesforce", desc: "Apex, LWC, 6 months professional exp" },
-  { icon: "🤖", label: "AI Engineering", desc: "LLMs, RAG, Agents — in progress" },
+  { icon: "🎓", label: "CS Foundation", desc: "C, C++, Java, Linux, Kernel Modules, Device Drivers, OS, DBMS" },
+  { icon: "🧩", label: "Problem Solving", desc: "300+ LeetCode solved · Ninja Dominator on Coding Ninjas" },
+  { icon: "⚡", label: "Full Stack", desc: "MERN, MEAN, Next.js, TypeScript, WebRTC, WebSockets" },
+  { icon: "🔗", label: "Web3 / Blockchain", desc: "Solana, Anchor, DEX, On-chain apps, DeFi" },
+  { icon: "☁️", label: "Salesforce", desc: "Apex, LWC, Agentforce, Einstein AI — 1 year professional exp" },
+  { icon: "🤖", label: "AI Engineering", desc: "LLMs, RAG, AI Agents, n8n, Vector DBs, Prompt Engineering" },
 ];
 
 export default function About() {
@@ -33,7 +34,7 @@ export default function About() {
               <p>
                 I&apos;m Roshan Patil — a developer from India with a deep CS foundation and a hunger
                 for high-impact engineering. I started with C/C++, moved through full-stack web and Web3,
-                and now I&apos;m a professional Salesforce Developer with 6 months of real-world Apex &amp; LWC experience.
+                and now I&apos;m a professional Salesforce Developer with 1 year of real-world Apex &amp; LWC experience at Cosmic Solutions, Goa.
               </p>
               <p>
                 My goal is clear: reach the highest-paying engineering roles by combining{" "}
@@ -75,14 +76,14 @@ export default function About() {
                 transition={{ delay: i * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="glass rounded-2xl p-4 border border-white/5 card-hover flex items-center gap-4"
               >
-                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-xl shrink-0">
                   {item.icon}
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-white">{item.label}</div>
                   <div className="text-xs text-white/40">{item.desc}</div>
                 </div>
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500/60 flex-shrink-0" />
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-500/60 shrink-0" />
               </motion.div>
             ))}
           </motion.div>
