@@ -7,7 +7,7 @@ import { stagger, fadeUp } from "@/lib/animations";
 const roles = [
   "Forward Deployed Engineer",
   "AI Solutions Engineer",
-  "Salesforce AI Developer",
+  "Salesforce Developer",
   "AI Integration Engineer",
   "AI Agent Builder",
 ];
