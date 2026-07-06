@@ -9,6 +9,7 @@ const journey = [
   { icon: "🔗", label: "Web3 / Blockchain", desc: "Solana, Anchor, DEX, On-chain apps, DeFi" },
   { icon: "⚡", label: "Full Stack", desc: "MERN, MEAN, Next.js, TypeScript, WebRTC, WebSockets" },
   { icon: "🧩", label: "Problem Solving", desc: "300+ LeetCode solved · Ninja Dominator on Coding Ninjas" },
+  { icon: "🐧", label: "Linux Systems Programming", desc: "Wrote custom kernel modules & device drivers, worked with system calls" },
   { icon: "🎓", label: "CS Foundation", desc: "C, C++, Java, Linux, Kernel Modules, Device Drivers, OS, DBMS" },
 ];
 
@@ -33,11 +34,14 @@ export default function About() {
             <div className="space-y-4 text-white/50 text-base leading-relaxed">
               <p>
                 I&apos;m Roshan Patil — a developer from India with a deep CS foundation and a hunger
-                for high-impact engineering. I started with C/C++, moved through full-stack web and Web3,
-                and now I&apos;m a professional Salesforce Developer with 1 year of real-world Apex &amp; LWC experience at Cosmic Solutions, Goa.
+                for high-impact engineering. I started with C/C++, wrote custom Linux kernel modules and
+                device drivers along the way, then moved through full-stack web and Web3, and now
+                I&apos;m a professional Salesforce Developer at Skillminds LLP, Nashik — working across
+                Apex, LWC, system architecture, integrations, automation (Flows), and deploying managed
+                packages on the Salesforce AppExchange.
               </p>
               <p>
-                My goal is clear: reach the highest-paying engineering roles by combining{" "}
+                My goal is clear: reach high-impact engineering roles by combining{" "}
                 <span className="text-violet-300">Salesforce expertise</span> with{" "}
                 <span className="text-blue-300">AI Engineering skills</span>. I&apos;m actively
                 building toward FDE, AI Solutions Engineer, and AI Integration Engineer roles.

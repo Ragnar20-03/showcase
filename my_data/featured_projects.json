@@ -101,5 +101,95 @@
     "tech_stack": ["TypeScript", "Solana", "React"],
     "category": "Web3 / Blockchain",
     "featured": false
+  },
+  {
+    "order": 11,
+    "name": "PDF Chat Assistant",
+    "repo": "rag_mastery/01_pdf_chat",
+    "description": "RAG pipeline for chatting with PDFs — chunking, vector search, and citations",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/01_pdf_chat",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
+  },
+  {
+    "order": 12,
+    "name": "Website RAG",
+    "repo": "rag_mastery/02_website_rag",
+    "description": "RAG over live websites — BFS crawling, scraping, and HTML cleaning",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/02_website_rag",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
+  },
+  {
+    "order": 13,
+    "name": "Multi-Doc Knowledge Base",
+    "repo": "rag_mastery/03_multi_doc_kb",
+    "description": "RAG across multiple file types with metadata filtering and document management",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/03_multi_doc_kb",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
+  },
+  {
+    "order": 14,
+    "name": "Hybrid Search RAG",
+    "repo": "rag_mastery/04_hybrid_search",
+    "description": "Combines BM25 keyword search with vector search via RRF merging and cross-encoder reranking",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/04_hybrid_search",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
+  },
+  {
+    "order": 15,
+    "name": "GitHub Codebase RAG",
+    "repo": "rag_mastery/05_github_rag",
+    "description": "RAG over codebases — AST-aware code chunking and repo ingestion",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/05_github_rag",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
+  },
+  {
+    "order": 16,
+    "name": "SQL + RAG",
+    "repo": "rag_mastery/06_sql_rag",
+    "description": "Text-to-SQL combined with hybrid structured and unstructured retrieval",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/06_sql_rag",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
+  },
+  {
+    "order": 17,
+    "name": "Multimodal RAG",
+    "repo": "rag_mastery/07_multimodal_rag",
+    "description": "RAG with vision models — image understanding and PDF visual extraction",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/07_multimodal_rag",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
+  },
+  {
+    "order": 18,
+    "name": "Knowledge Graph RAG",
+    "repo": "rag_mastery/08_knowledge_graph_rag",
+    "description": "Entity extraction and graph traversal fused with vector retrieval",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/08_knowledge_graph_rag",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
+  },
+  {
+    "order": 19,
+    "name": "Agentic RAG",
+    "repo": "rag_mastery/09_agentic_rag",
+    "description": "ReAct-pattern agent with tool calling and dynamic multi-step reasoning over retrieved data",
+    "github_url": "https://github.com/Ragnar20-03/rag_mastery/tree/main/09_agentic_rag",
+    "tech_stack": ["Python", "Ollama", "ChromaDB", "LangChain"],
+    "category": "AI / ML",
+    "featured": true
   }
 ]

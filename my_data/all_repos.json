@@ -57,5 +57,6 @@
   { "name": "Angular-Assignments", "description": null, "language": "TypeScript", "url": "https://github.com/Ragnar20-03/Angular-Assignments", "stars": 0 },
   { "name": "C-", "description": null, "language": "C#", "url": "https://github.com/Ragnar20-03/C-", "stars": 0 },
   { "name": "Client--Server-Architecture-", "description": null, "language": "Java", "url": "https://github.com/Ragnar20-03/Client--Server-Architecture-", "stars": 0 },
-  { "name": "Box-Office", "description": null, "language": "JavaScript", "url": "https://github.com/Ragnar20-03/Box-Office", "stars": 0 }
+  { "name": "Box-Office", "description": null, "language": "JavaScript", "url": "https://github.com/Ragnar20-03/Box-Office", "stars": 0 },
+  { "name": "rag_mastery", "description": "9 progressive RAG projects — PDF chat, hybrid search, GitHub RAG, SQL RAG, multimodal, knowledge graph, agentic RAG", "language": "Python", "url": "https://github.com/Ragnar20-03/rag_mastery", "stars": 0 }
 ]
