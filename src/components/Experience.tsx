@@ -10,11 +10,12 @@ const experiences = [
     period: "2025 — Present · 1 yr",
     current: true,
     description: [
-      "Building Salesforce solutions using Apex and Lightning Web Components (LWC)",
-      "Intermediate knowledge of core Salesforce platform, automation, and integrations",
+      "Building Salesforce solutions using Apex, LWC, and system architecture design",
+      "Working across core platform capabilities — automation, integrations, and SOQL",
+      "Deployed managed packages on the Salesforce AppExchange",
       "Exploring Salesforce AI / Agentforce integration",
     ],
-    tech: ["Apex", "LWC", "Salesforce", "SOQL", "Agentforce"],
+    tech: ["Apex", "LWC", "Salesforce", "SOQL", "Agentforce", "AppExchange"],
   },
   {
     role: "Full Stack Web Developer",

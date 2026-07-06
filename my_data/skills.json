@@ -4,9 +4,10 @@
   "backend": ["Node.js", "Express.js"],
   "blockchain": ["Solana", "Web3.js", "Anchor Framework"],
   "databases": ["MongoDB", "PostgreSQL"],
-  "salesforce": ["Apex", "LWC (Lightning Web Components)", "Salesforce Platform", "Agentforce"],
-  "ai_ml": ["LLM APIs", "RAG Pipelines", "AI Agents", "n8n Automation", "Python"],
+  "salesforce": ["Apex", "LWC (Lightning Web Components)", "Salesforce Platform", "System Architecture", "AppExchange Managed Packages", "Agentforce"],
+  "ai_ml": ["LLM APIs", "RAG Pipelines", "Hybrid Search (BM25 + Vector)", "Knowledge Graph RAG", "Agentic RAG", "AI Agents", "Ollama", "ChromaDB", "LangChain", "n8n Automation", "Python"],
   "cloud_devops": ["AWS", "Docker", "Linux"],
   "tools": ["Git", "Docker", "Linux"],
+  "systems_programming": ["Linux Kernel Modules", "Device Drivers", "System Calls"],
   "currently_learning": ["Python", "LLM APIs", "RAG", "AI Agents", "AWS"]
 }
