@@ -76,7 +76,7 @@ export default function Hero() {
         variants={stagger}
         initial="hidden"
         animate="visible"
-        className="relative z-10 text-center max-w-5xl mx-auto"
+        className="relative z-10 text-center max-w-5xl mx-auto mb-20"
       >
         {/* Badge */}
         <motion.div variants={fadeUp} className="flex justify-center mb-8">
@@ -139,7 +139,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.5 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
       >
         <span className="text-xs text-white/20">scroll</span>
         <motion.div
