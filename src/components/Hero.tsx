@@ -13,9 +13,12 @@ const roles = [
 ];
 
 const stats = [
+  { value: "Salesforce + AI Developer", label: "" },
+  { value: "AI Engineer", label: "" },
+  { value: "Full Stack Developer", label: "" },
+  { value: "Blockchain Developer", label: "" },
+  { value: "Linux System Programming", label: "" },
   { value: "63+", label: "GitHub Repos" },
-  { value: "300+", label: "LeetCode Solved" },
-  { value: "10+", label: "Web3 Projects" },
   { value: "Ninja", label: "Dominator — CN" },
 ];
 
