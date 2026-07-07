@@ -54,7 +54,7 @@ function TypingText({ texts }: { texts: string[] }) {
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 pt-28 pb-20">
       {/* Background glow orbs */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
@@ -76,7 +76,7 @@ export default function Hero() {
         variants={stagger}
         initial="hidden"
         animate="visible"
-        className="relative z-10 text-center max-w-5xl mx-auto mb-20"
+        className="relative z-10 text-center max-w-5xl mx-auto"
       >
         {/* Badge */}
         <motion.div variants={fadeUp} className="flex justify-center mb-8">
