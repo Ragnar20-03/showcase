@@ -6,15 +6,21 @@ import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import { getProjectOrder } from "@/sanity/lib/projectOrder";
+import { applyProjectOrder } from "@/lib/project-order";
+import { defaultProjects } from "@/lib/projects-data";
 
-export default function Home() {
+export default async function Home() {
+  const order = await getProjectOrder();
+  const orderedProjects = applyProjectOrder(defaultProjects, order);
+
   return (
     <main>
       <Navbar />
       <Hero />
       <About />
       <Skills />
-      <Projects />
+      <Projects projects={orderedProjects} />
       <Experience />
       <Contact />
       <Footer />
