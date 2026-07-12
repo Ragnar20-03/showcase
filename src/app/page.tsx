@@ -6,7 +6,7 @@ import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import { getProjectOrder } from "@/sanity/lib/projectOrder";
+import { getProjectOrder } from "@/lib/project-order-store";
 import { applyProjectOrder } from "@/lib/project-order";
 import { defaultProjects } from "@/lib/projects-data";
 
