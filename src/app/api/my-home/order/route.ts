@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
-import { getProjectOrder, saveProjectOrder } from "@/sanity/lib/projectOrder";
+import { getProjectOrder, saveProjectOrder } from "@/lib/project-order-store";
 import { defaultProjects, CATEGORIES, type ProjectCategory } from "@/lib/projects-data";
 import type { ProjectOrder } from "@/lib/project-order";
 
