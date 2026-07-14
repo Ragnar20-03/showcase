@@ -1,4 +1,5 @@
 import { defaultProjects, type ProjectCategory } from "./projects-data";
+import { extractRepoSlug } from "./repo-slug";
 
 const GITHUB_USER = "Ragnar20-03";
 const EXCLUDED_SLUGS = new Set(["showcase"]);
@@ -19,11 +20,6 @@ export type NewSyncedProject = {
   category: ProjectCategory;
   repoSlug: string;
 };
-
-function extractRepoSlug(githubUrl: string): string {
-  const match = githubUrl.match(/github\.com\/[^/]+\/([^/]+)/);
-  return match ? match[1] : githubUrl;
-}
 
 /** Fetches all public repos for the account and returns only the ones not already
  * represented (by repo slug) in the hardcoded project list or the given known-slugs set. */
