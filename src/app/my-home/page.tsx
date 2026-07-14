@@ -13,11 +13,35 @@ function move<T>(list: T[], index: number, direction: -1 | 1): T[] {
   return next;
 }
 
+/** Pure transform — no state calls — so it's safe to call from an effect or a handler alike. */
+function buildOrderedState(data: { projects: Project[]; order: ProjectOrder | null }) {
+  const grouped: Record<ProjectCategory, string[]> = { web3: [], fullstack: [], ai: [] };
+  for (const p of data.projects) grouped[p.category].push(p.name);
+
+  let categoryOrder: ProjectCategory[] | null = null;
+  if (data.order) {
+    const applyKnownFirst = (all: string[], saved: string[] | undefined) => {
+      if (!saved || saved.length === 0) return all;
+      const known = saved.filter((n) => all.includes(n));
+      const missing = all.filter((n) => !known.includes(n));
+      return [...known, ...missing];
+    };
+    grouped.ai = applyKnownFirst(grouped.ai, data.order.aiOrder);
+    grouped.web3 = applyKnownFirst(grouped.web3, data.order.web3Order);
+    grouped.fullstack = applyKnownFirst(grouped.fullstack, data.order.fullstackOrder);
+    if (data.order.categoryOrder?.length) categoryOrder = data.order.categoryOrder;
+  }
+
+  return { grouped, categoryOrder };
+}
+
 export default function AdjustProjectsPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [message, setMessage] = useState("");
+  const [syncMessage, setSyncMessage] = useState("");
   const [categoryOrder, setCategoryOrder] = useState<ProjectCategory[]>(CATEGORIES);
   const [namesByCategory, setNamesByCategory] = useState<Record<ProjectCategory, string[]>>({
     web3: [],
@@ -29,26 +53,42 @@ export default function AdjustProjectsPage() {
     fetch("/api/my-home/order")
       .then((res) => res.json())
       .then((data: { projects: Project[]; order: ProjectOrder | null }) => {
-        const grouped: Record<ProjectCategory, string[]> = { web3: [], fullstack: [], ai: [] };
-        for (const p of data.projects) grouped[p.category].push(p.name);
-
-        if (data.order) {
-          const applyKnownFirst = (all: string[], saved: string[] | undefined) => {
-            if (!saved || saved.length === 0) return all;
-            const known = saved.filter((n) => all.includes(n));
-            const missing = all.filter((n) => !known.includes(n));
-            return [...known, ...missing];
-          };
-          grouped.ai = applyKnownFirst(grouped.ai, data.order.aiOrder);
-          grouped.web3 = applyKnownFirst(grouped.web3, data.order.web3Order);
-          grouped.fullstack = applyKnownFirst(grouped.fullstack, data.order.fullstackOrder);
-          if (data.order.categoryOrder?.length) setCategoryOrder(data.order.categoryOrder);
-        }
-
+        const { grouped, categoryOrder: nextCategoryOrder } = buildOrderedState(data);
+        if (nextCategoryOrder) setCategoryOrder(nextCategoryOrder);
         setNamesByCategory(grouped);
         setLoading(false);
       });
   }, []);
+
+  async function handleSync() {
+    setSyncing(true);
+    setSyncMessage("");
+
+    const res = await fetch("/api/my-home/sync", { method: "POST" });
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      setSyncMessage(data.error ?? "Sync failed");
+      setSyncing(false);
+      return;
+    }
+
+    setSyncMessage(
+      data.added > 0
+        ? `Added ${data.added} new project${data.added === 1 ? "" : "s"} from GitHub (defaulted to Full Stack — recategorize below if needed).`
+        : "No new repos found — everything's already synced."
+    );
+
+    if (data.added > 0) {
+      const orderRes = await fetch("/api/my-home/order");
+      const orderData: { projects: Project[]; order: ProjectOrder | null } = await orderRes.json();
+      const { grouped, categoryOrder: nextCategoryOrder } = buildOrderedState(orderData);
+      if (nextCategoryOrder) setCategoryOrder(nextCategoryOrder);
+      setNamesByCategory(grouped);
+    }
+
+    setSyncing(false);
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -93,7 +133,7 @@ export default function AdjustProjectsPage() {
 
   return (
     <main className="min-h-screen px-4 py-12 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-white">Adjust Projects</h1>
         <button
           onClick={handleLogout}
@@ -101,6 +141,17 @@ export default function AdjustProjectsPage() {
         >
           Log out
         </button>
+      </div>
+
+      <div className="flex items-center gap-4 mb-8">
+        <button
+          onClick={handleSync}
+          disabled={syncing}
+          className="px-4 py-2 rounded-xl font-semibold text-sm glass border border-white/10 hover:border-violet-500/30 text-white/80 hover:text-white transition-all duration-200 disabled:opacity-50"
+        >
+          {syncing ? "Syncing…" : "Sync from GitHub"}
+        </button>
+        {syncMessage && <p className="text-xs text-white/50">{syncMessage}</p>}
       </div>
 
       {/* Category order */}
