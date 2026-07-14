@@ -8,6 +8,7 @@ const SyncedProjectSchema = new Schema(
     github: { type: String, required: true },
     tech: { type: [String], default: [] },
     category: { type: String, enum: CATEGORIES, default: "fullstack" },
+    highlight: { type: String, required: false },
     repoSlug: { type: String, required: true, unique: true },
   },
   { timestamps: true }

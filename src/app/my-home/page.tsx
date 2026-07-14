@@ -48,6 +48,24 @@ export default function AdjustProjectsPage() {
     fullstack: [],
     ai: [],
   });
+  const [newProject, setNewProject] = useState({
+    name: "",
+    description: "",
+    github: "",
+    tech: "",
+    category: "fullstack" as ProjectCategory,
+    highlight: "",
+  });
+  const [addingProject, setAddingProject] = useState(false);
+  const [addMessage, setAddMessage] = useState("");
+
+  async function refreshOrder() {
+    const res = await fetch("/api/my-home/order");
+    const data: { projects: Project[]; order: ProjectOrder | null } = await res.json();
+    const { grouped, categoryOrder: nextCategoryOrder } = buildOrderedState(data);
+    if (nextCategoryOrder) setCategoryOrder(nextCategoryOrder);
+    setNamesByCategory(grouped);
+  }
 
   useEffect(() => {
     fetch("/api/my-home/order")
@@ -79,15 +97,41 @@ export default function AdjustProjectsPage() {
         : "No new repos found — everything's already synced."
     );
 
-    if (data.added > 0) {
-      const orderRes = await fetch("/api/my-home/order");
-      const orderData: { projects: Project[]; order: ProjectOrder | null } = await orderRes.json();
-      const { grouped, categoryOrder: nextCategoryOrder } = buildOrderedState(orderData);
-      if (nextCategoryOrder) setCategoryOrder(nextCategoryOrder);
-      setNamesByCategory(grouped);
-    }
+    if (data.added > 0) await refreshOrder();
 
     setSyncing(false);
+  }
+
+  async function handleAddProject(e: React.FormEvent) {
+    e.preventDefault();
+    setAddingProject(true);
+    setAddMessage("");
+
+    const res = await fetch("/api/my-home/add-project", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: newProject.name,
+        description: newProject.description,
+        github: newProject.github,
+        tech: newProject.tech.split(",").map((t) => t.trim()).filter(Boolean),
+        category: newProject.category,
+        highlight: newProject.highlight,
+      }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      setAddMessage(data.error ?? "Failed to add project");
+      setAddingProject(false);
+      return;
+    }
+
+    setAddMessage(`Added "${newProject.name}" to ${CATEGORY_LABELS[newProject.category]}.`);
+    setNewProject({ name: "", description: "", github: "", tech: "", category: "fullstack", highlight: "" });
+    await refreshOrder();
+    setAddingProject(false);
   }
 
   async function handleSave() {
@@ -153,6 +197,96 @@ export default function AdjustProjectsPage() {
         </button>
         {syncMessage && <p className="text-xs text-white/50">{syncMessage}</p>}
       </div>
+
+      {/* Add project manually */}
+      <section className="glass rounded-2xl p-5 border border-white/8 mb-6">
+        <h2 className="text-sm font-semibold text-white mb-3">Add a project</h2>
+        <form onSubmit={handleAddProject} className="space-y-3">
+          <div className="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs text-white/40 mb-1">Name</label>
+              <input
+                type="text"
+                required
+                value={newProject.name}
+                onChange={(e) => setNewProject((p) => ({ ...p, name: e.target.value }))}
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-white/40 mb-1">GitHub URL</label>
+              <input
+                type="text"
+                required
+                value={newProject.github}
+                onChange={(e) => setNewProject((p) => ({ ...p, github: e.target.value }))}
+                placeholder="https://github.com/Ragnar20-03/..."
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs text-white/40 mb-1">Description</label>
+            <input
+              type="text"
+              value={newProject.description}
+              onChange={(e) => setNewProject((p) => ({ ...p, description: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+            />
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs text-white/40 mb-1">Tech (comma-separated)</label>
+              <input
+                type="text"
+                value={newProject.tech}
+                onChange={(e) => setNewProject((p) => ({ ...p, tech: e.target.value }))}
+                placeholder="TypeScript, React"
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+              />
+            </div>
+            <div>
+              <label className="block text-xs text-white/40 mb-1">Category</label>
+              <select
+                value={newProject.category}
+                onChange={(e) =>
+                  setNewProject((p) => ({ ...p, category: e.target.value as ProjectCategory }))
+                }
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat} className="bg-black">
+                    {CATEGORY_LABELS[cat]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-white/40 mb-1">Highlight badge (optional)</label>
+              <input
+                type="text"
+                value={newProject.highlight}
+                onChange={(e) => setNewProject((p) => ({ ...p, highlight: e.target.value }))}
+                placeholder="RAG"
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4 pt-1">
+            <button
+              type="submit"
+              disabled={addingProject}
+              className="px-5 py-2 rounded-xl font-semibold text-sm bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200 disabled:opacity-50"
+            >
+              {addingProject ? "Adding…" : "Add project"}
+            </button>
+            {addMessage && <p className="text-xs text-white/50">{addMessage}</p>}
+          </div>
+        </form>
+      </section>
 
       {/* Category order */}
       <section className="glass rounded-2xl p-5 border border-white/8 mb-6">
