@@ -2,12 +2,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { revalidatePath } from "next/cache";
 import { getProjectOrder, saveProjectOrder } from "@/lib/project-order-store";
+import { getSyncedProjects } from "@/lib/synced-projects-store";
 import { defaultProjects, CATEGORIES, type ProjectCategory } from "@/lib/projects-data";
 import type { ProjectOrder } from "@/lib/project-order";
 
 export async function GET() {
-  const order = await getProjectOrder();
-  return NextResponse.json({ projects: defaultProjects, order });
+  const [order, synced] = await Promise.all([getProjectOrder(), getSyncedProjects()]);
+  return NextResponse.json({ projects: [...defaultProjects, ...synced], order });
 }
 
 function isCategoryArray(value: unknown): value is ProjectCategory[] {
