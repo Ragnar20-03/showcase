@@ -5,6 +5,7 @@ const SyncedProjectSchema = new Schema(
   {
     name: { type: String, required: true },
     description: { type: String, default: "" },
+    fullDescription: { type: String, required: false },
     github: { type: String, required: true },
     tech: { type: [String], default: [] },
     category: { type: String, enum: CATEGORIES, default: "fullstack" },
