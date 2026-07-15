@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
 
   const name = typeof body?.name === "string" ? body.name.trim() : "";
   const description = typeof body?.description === "string" ? body.description.trim() : "";
+  const fullDescription =
+    typeof body?.fullDescription === "string" ? body.fullDescription.trim() : "";
   const github = typeof body?.github === "string" ? body.github.trim() : "";
   const highlight = typeof body?.highlight === "string" ? body.highlight.trim() : "";
   const category = body?.category as ProjectCategory;
@@ -30,6 +32,7 @@ export async function POST(request: NextRequest) {
       github,
       tech,
       category,
+      ...(fullDescription ? { fullDescription } : {}),
       ...(highlight ? { highlight } : {}),
     });
   } catch (err) {

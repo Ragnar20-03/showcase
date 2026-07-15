@@ -7,6 +7,7 @@ import type { NewSyncedProject } from "./github-sync";
 type SyncedDoc = {
   name: string;
   description: string;
+  fullDescription?: string;
   github: string;
   tech: string[];
   category: Project["category"];
@@ -23,6 +24,7 @@ export async function getSyncedProjects(): Promise<Project[]> {
       github: d.github,
       tech: d.tech,
       category: d.category,
+      ...(d.fullDescription ? { fullDescription: d.fullDescription } : {}),
       ...(d.highlight ? { highlight: d.highlight } : {}),
     }));
   } catch {
@@ -33,6 +35,7 @@ export async function getSyncedProjects(): Promise<Project[]> {
 export type ManualProjectInput = {
   name: string;
   description: string;
+  fullDescription?: string;
   github: string;
   tech: string[];
   category: ProjectCategory;

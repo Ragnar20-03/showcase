@@ -4,6 +4,22 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CATEGORIES, CATEGORY_LABELS, type Project, type ProjectCategory } from "@/lib/projects-data";
 import type { ProjectOrder } from "@/lib/project-order";
+import type { ProjectOverrideFields } from "@/lib/project-overrides";
+
+type OrderResponse = {
+  projects: Project[];
+  order: ProjectOrder | null;
+  overrides: Record<string, ProjectOverrideFields>;
+};
+
+type EditForm = {
+  description: string;
+  fullDescription: string;
+  tech: string;
+  category: ProjectCategory;
+  github: string;
+  highlight: string;
+};
 
 function move<T>(list: T[], index: number, direction: -1 | 1): T[] {
   const target = index + direction;
@@ -14,9 +30,13 @@ function move<T>(list: T[], index: number, direction: -1 | 1): T[] {
 }
 
 /** Pure transform — no state calls — so it's safe to call from an effect or a handler alike. */
-function buildOrderedState(data: { projects: Project[]; order: ProjectOrder | null }) {
+function buildOrderedState(data: OrderResponse) {
   const grouped: Record<ProjectCategory, string[]> = { web3: [], fullstack: [], ai: [] };
-  for (const p of data.projects) grouped[p.category].push(p.name);
+  const projectsByName: Record<string, Project> = {};
+  for (const p of data.projects) {
+    grouped[p.category].push(p.name);
+    projectsByName[p.name] = p;
+  }
 
   let categoryOrder: ProjectCategory[] | null = null;
   if (data.order) {
@@ -32,7 +52,18 @@ function buildOrderedState(data: { projects: Project[]; order: ProjectOrder | nu
     if (data.order.categoryOrder?.length) categoryOrder = data.order.categoryOrder;
   }
 
-  return { grouped, categoryOrder };
+  return { grouped, categoryOrder, projectsByName, overrides: data.overrides };
+}
+
+function effectiveProject(name: string, base: Project | undefined, override: ProjectOverrideFields | undefined): EditForm {
+  return {
+    description: override?.description ?? base?.description ?? "",
+    fullDescription: override?.fullDescription ?? base?.fullDescription ?? "",
+    tech: (override?.tech ?? base?.tech ?? []).join(", "),
+    category: override?.category ?? base?.category ?? "fullstack",
+    github: override?.github ?? base?.github ?? "",
+    highlight: override?.highlight ?? base?.highlight ?? "",
+  };
 }
 
 export default function AdjustProjectsPage() {
@@ -48,9 +79,16 @@ export default function AdjustProjectsPage() {
     fullstack: [],
     ai: [],
   });
+  const [projectsByName, setProjectsByName] = useState<Record<string, Project>>({});
+  const [overrides, setOverrides] = useState<Record<string, ProjectOverrideFields>>({});
+  const [editingProject, setEditingProject] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<EditForm | null>(null);
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [rowMessage, setRowMessage] = useState<{ name: string; text: string } | null>(null);
   const [newProject, setNewProject] = useState({
     name: "",
     description: "",
+    fullDescription: "",
     github: "",
     tech: "",
     category: "fullstack" as ProjectCategory,
@@ -61,22 +99,84 @@ export default function AdjustProjectsPage() {
 
   async function refreshOrder() {
     const res = await fetch("/api/my-home/order");
-    const data: { projects: Project[]; order: ProjectOrder | null } = await res.json();
-    const { grouped, categoryOrder: nextCategoryOrder } = buildOrderedState(data);
+    const data: OrderResponse = await res.json();
+    const { grouped, categoryOrder: nextCategoryOrder, projectsByName: nextProjects, overrides: nextOverrides } =
+      buildOrderedState(data);
     if (nextCategoryOrder) setCategoryOrder(nextCategoryOrder);
     setNamesByCategory(grouped);
+    setProjectsByName(nextProjects);
+    setOverrides(nextOverrides);
   }
 
   useEffect(() => {
     fetch("/api/my-home/order")
       .then((res) => res.json())
-      .then((data: { projects: Project[]; order: ProjectOrder | null }) => {
-        const { grouped, categoryOrder: nextCategoryOrder } = buildOrderedState(data);
+      .then((data: OrderResponse) => {
+        const { grouped, categoryOrder: nextCategoryOrder, projectsByName: nextProjects, overrides: nextOverrides } =
+          buildOrderedState(data);
         if (nextCategoryOrder) setCategoryOrder(nextCategoryOrder);
         setNamesByCategory(grouped);
+        setProjectsByName(nextProjects);
+        setOverrides(nextOverrides);
         setLoading(false);
       });
   }, []);
+
+  function handleStartEdit(name: string) {
+    setEditingProject(name);
+    setEditForm(effectiveProject(name, projectsByName[name], overrides[name]));
+    setRowMessage(null);
+  }
+
+  async function handleSaveEdit(name: string) {
+    if (!editForm) return;
+    setSavingEdit(true);
+
+    const res = await fetch("/api/my-home/override", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        projectKey: name,
+        description: editForm.description,
+        fullDescription: editForm.fullDescription,
+        tech: editForm.tech.split(",").map((t) => t.trim()).filter(Boolean),
+        category: editForm.category,
+        github: editForm.github,
+        highlight: editForm.highlight,
+      }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+    setSavingEdit(false);
+
+    if (!res.ok) {
+      setRowMessage({ name, text: data.error ?? "Failed to save" });
+      return;
+    }
+
+    setEditingProject(null);
+    setEditForm(null);
+    setRowMessage({ name, text: "Saved." });
+    await refreshOrder();
+  }
+
+  async function handleToggleHide(name: string) {
+    const isHidden = overrides[name]?.hidden === true;
+
+    const res = await fetch("/api/my-home/override", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ projectKey: name, hidden: !isHidden }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setRowMessage({ name, text: data.error ?? "Failed to update" });
+      return;
+    }
+
+    await refreshOrder();
+  }
 
   async function handleSync() {
     setSyncing(true);
@@ -113,6 +213,7 @@ export default function AdjustProjectsPage() {
       body: JSON.stringify({
         name: newProject.name,
         description: newProject.description,
+        fullDescription: newProject.fullDescription,
         github: newProject.github,
         tech: newProject.tech.split(",").map((t) => t.trim()).filter(Boolean),
         category: newProject.category,
@@ -129,7 +230,15 @@ export default function AdjustProjectsPage() {
     }
 
     setAddMessage(`Added "${newProject.name}" to ${CATEGORY_LABELS[newProject.category]}.`);
-    setNewProject({ name: "", description: "", github: "", tech: "", category: "fullstack", highlight: "" });
+    setNewProject({
+      name: "",
+      description: "",
+      fullDescription: "",
+      github: "",
+      tech: "",
+      category: "fullstack",
+      highlight: "",
+    });
     await refreshOrder();
     setAddingProject(false);
   }
@@ -227,11 +336,23 @@ export default function AdjustProjectsPage() {
           </div>
 
           <div>
-            <label className="block text-xs text-white/40 mb-1">Description</label>
+            <label className="block text-xs text-white/40 mb-1">Short description (shown on the card)</label>
             <input
               type="text"
               value={newProject.description}
               onChange={(e) => setNewProject((p) => ({ ...p, description: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-white/40 mb-1">
+              Full description (shown in the popup — optional, falls back to short description)
+            </label>
+            <textarea
+              rows={3}
+              value={newProject.fullDescription}
+              onChange={(e) => setNewProject((p) => ({ ...p, fullDescription: e.target.value }))}
               className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
             />
           </div>
@@ -326,34 +447,155 @@ export default function AdjustProjectsPage() {
         <section key={cat} className="glass rounded-2xl p-5 border border-white/8 mb-6">
           <h2 className="text-sm font-semibold text-white mb-3">{CATEGORY_LABELS[cat]}</h2>
           <ul className="space-y-1.5">
-            {namesByCategory[cat].map((name, i) => (
-              <li
-                key={name}
-                className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 border border-white/8"
-              >
-                <span className="text-sm text-white/70">{name}</span>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() =>
-                      setNamesByCategory((s) => ({ ...s, [cat]: move(s[cat], i, -1) }))
-                    }
-                    disabled={i === 0}
-                    className="px-2 py-1 rounded text-xs text-white/50 hover:text-white disabled:opacity-20"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    onClick={() =>
-                      setNamesByCategory((s) => ({ ...s, [cat]: move(s[cat], i, 1) }))
-                    }
-                    disabled={i === namesByCategory[cat].length - 1}
-                    className="px-2 py-1 rounded text-xs text-white/50 hover:text-white disabled:opacity-20"
-                  >
-                    ↓
-                  </button>
-                </div>
-              </li>
-            ))}
+            {namesByCategory[cat].map((name, i) => {
+              const isHidden = overrides[name]?.hidden === true;
+              const isEditing = editingProject === name;
+
+              return (
+                <li
+                  key={name}
+                  className={`rounded-lg bg-white/5 border border-white/8 ${isHidden ? "opacity-40" : ""}`}
+                >
+                  <div className="flex items-center justify-between px-3 py-2">
+                    <span className="text-sm text-white/70">
+                      {name}
+                      {isHidden && <span className="ml-2 text-[10px] text-white/30">(hidden)</span>}
+                    </span>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => {
+                          if (isEditing) {
+                            setEditingProject(null);
+                            setEditForm(null);
+                          } else {
+                            handleStartEdit(name);
+                          }
+                        }}
+                        className="px-2 py-1 rounded text-xs text-white/50 hover:text-white"
+                      >
+                        {isEditing ? "Cancel" : "Edit"}
+                      </button>
+                      <button
+                        onClick={() => handleToggleHide(name)}
+                        className="px-2 py-1 rounded text-xs text-white/50 hover:text-white"
+                      >
+                        {isHidden ? "Show" : "Hide"}
+                      </button>
+                      <button
+                        onClick={() =>
+                          setNamesByCategory((s) => ({ ...s, [cat]: move(s[cat], i, -1) }))
+                        }
+                        disabled={i === 0}
+                        className="px-2 py-1 rounded text-xs text-white/50 hover:text-white disabled:opacity-20"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        onClick={() =>
+                          setNamesByCategory((s) => ({ ...s, [cat]: move(s[cat], i, 1) }))
+                        }
+                        disabled={i === namesByCategory[cat].length - 1}
+                        className="px-2 py-1 rounded text-xs text-white/50 hover:text-white disabled:opacity-20"
+                      >
+                        ↓
+                      </button>
+                    </div>
+                  </div>
+
+                  {isEditing && editForm && (
+                    <div className="px-3 pb-3 pt-1 space-y-2 border-t border-white/8">
+                      <div>
+                        <label className="block text-[10px] text-white/40 mb-1">Short description</label>
+                        <input
+                          type="text"
+                          value={editForm.description}
+                          onChange={(e) =>
+                            setEditForm((f) => (f ? { ...f, description: e.target.value } : f))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-white/40 mb-1">Full description</label>
+                        <textarea
+                          rows={3}
+                          value={editForm.fullDescription}
+                          onChange={(e) =>
+                            setEditForm((f) => (f ? { ...f, fullDescription: e.target.value } : f))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/50"
+                        />
+                      </div>
+                      <div className="grid sm:grid-cols-3 gap-2">
+                        <div>
+                          <label className="block text-[10px] text-white/40 mb-1">Tech (comma-separated)</label>
+                          <input
+                            type="text"
+                            value={editForm.tech}
+                            onChange={(e) =>
+                              setEditForm((f) => (f ? { ...f, tech: e.target.value } : f))
+                            }
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-white/40 mb-1">Category</label>
+                          <select
+                            value={editForm.category}
+                            onChange={(e) =>
+                              setEditForm((f) =>
+                                f ? { ...f, category: e.target.value as ProjectCategory } : f
+                              )
+                            }
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/50"
+                          >
+                            {CATEGORIES.map((c) => (
+                              <option key={c} value={c} className="bg-black">
+                                {CATEGORY_LABELS[c]}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] text-white/40 mb-1">Highlight badge</label>
+                          <input
+                            type="text"
+                            value={editForm.highlight}
+                            onChange={(e) =>
+                              setEditForm((f) => (f ? { ...f, highlight: e.target.value } : f))
+                            }
+                            className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/50"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] text-white/40 mb-1">GitHub URL</label>
+                        <input
+                          type="text"
+                          value={editForm.github}
+                          onChange={(e) =>
+                            setEditForm((f) => (f ? { ...f, github: e.target.value } : f))
+                          }
+                          className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/50"
+                        />
+                      </div>
+                      <div className="flex items-center gap-3 pt-1">
+                        <button
+                          onClick={() => handleSaveEdit(name)}
+                          disabled={savingEdit}
+                          className="px-4 py-1.5 rounded-lg font-semibold text-xs bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200 disabled:opacity-50"
+                        >
+                          {savingEdit ? "Saving…" : "Save"}
+                        </button>
+                        {rowMessage?.name === name && (
+                          <p className="text-[10px] text-white/50">{rowMessage.text}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </section>
       ))}

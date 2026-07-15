@@ -3,6 +3,7 @@ export type ProjectCategory = "web3" | "fullstack" | "ai";
 export type Project = {
   name: string;
   description: string;
+  fullDescription?: string;
   github: string;
   tech: string[];
   category: ProjectCategory;
