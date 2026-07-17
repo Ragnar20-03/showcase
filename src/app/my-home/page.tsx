@@ -1,7 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { CATEGORIES, CATEGORY_LABELS, type Project, type ProjectCategory } from "@/lib/projects-data";
 import type { ProjectOrder } from "@/lib/project-order";
 import type { ProjectOverrideFields } from "@/lib/project-overrides";
@@ -21,14 +31,6 @@ type EditForm = {
   github: string;
   highlight: string;
 };
-
-function move<T>(list: T[], index: number, direction: -1 | 1): T[] {
-  const target = index + direction;
-  if (target < 0 || target >= list.length) return list;
-  const next = [...list];
-  [next[index], next[target]] = [next[target], next[index]];
-  return next;
-}
 
 /** Pure transform — no state calls — so it's safe to call from an effect or a handler alike. */
 function buildOrderedState(data: OrderResponse) {
@@ -53,7 +55,45 @@ function buildOrderedState(data: OrderResponse) {
     if (data.order.categoryOrder?.length) categoryOrder = data.order.categoryOrder;
   }
 
+  // Hidden projects sort to the bottom of their category — stable sort keeps
+  // everything else in its existing relative order.
+  const sortHiddenLast = (names: string[]) =>
+    [...names].sort((a, b) => {
+      const aHidden = data.overrides[a]?.hidden ? 1 : 0;
+      const bHidden = data.overrides[b]?.hidden ? 1 : 0;
+      return aHidden - bHidden;
+    });
+  grouped.ai = sortHiddenLast(grouped.ai);
+  grouped.web3 = sortHiddenLast(grouped.web3);
+  grouped.fullstack = sortHiddenLast(grouped.fullstack);
+
   return { grouped, categoryOrder, projectsByName, overrides: data.overrides };
+}
+
+function SortableRow({
+  id,
+  className,
+  children,
+}: {
+  id: string;
+  className?: string;
+  children: (drag: {
+    attributes: ReturnType<typeof useSortable>["attributes"];
+    listeners: ReturnType<typeof useSortable>["listeners"];
+  }) => ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.6 : 1,
+  };
+
+  return (
+    <li ref={setNodeRef} style={style} className={className}>
+      {children({ attributes, listeners })}
+    </li>
+  );
 }
 
 function effectiveProject(name: string, base: Project | undefined, override: ProjectOverrideFields | undefined): EditForm {
@@ -172,6 +212,29 @@ export default function AdjustProjectsPage() {
     }
 
     await refreshHeroStats();
+  }
+
+  const dndSensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  function handleCategoryDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setCategoryOrder((c) => {
+      const oldIndex = c.indexOf(active.id as ProjectCategory);
+      const newIndex = c.indexOf(over.id as ProjectCategory);
+      return arrayMove(c, oldIndex, newIndex);
+    });
+  }
+
+  function handleProjectDragEnd(cat: ProjectCategory, event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setNamesByCategory((s) => {
+      const list = s[cat];
+      const oldIndex = list.indexOf(active.id as string);
+      const newIndex = list.indexOf(over.id as string);
+      return { ...s, [cat]: arrayMove(list, oldIndex, newIndex) };
+    });
   }
 
   async function refreshOrder() {
@@ -610,95 +673,99 @@ export default function AdjustProjectsPage() {
         <h2 className="text-sm font-semibold text-white mb-3">
           Category order (controls the &quot;All&quot; tab)
         </h2>
-        <ul className="space-y-1.5">
-          {categoryOrder.map((cat, i) => (
-            <li
-              key={cat}
-              className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 border border-white/8"
-            >
-              <span className="text-sm text-white/80">{CATEGORY_LABELS[cat]}</span>
-              <div className="flex gap-1">
-                <button
-                  onClick={() => setCategoryOrder((c) => move(c, i, -1))}
-                  disabled={i === 0}
-                  className="px-2 py-1 rounded text-xs text-white/50 hover:text-white disabled:opacity-20"
+        <DndContext sensors={dndSensors} collisionDetection={closestCenter} onDragEnd={handleCategoryDragEnd}>
+          <SortableContext items={categoryOrder} strategy={verticalListSortingStrategy}>
+            <ul className="space-y-1.5">
+              {categoryOrder.map((cat) => (
+                <SortableRow
+                  key={cat}
+                  id={cat}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-white/5 border border-white/8"
                 >
-                  ↑
-                </button>
-                <button
-                  onClick={() => setCategoryOrder((c) => move(c, i, 1))}
-                  disabled={i === categoryOrder.length - 1}
-                  className="px-2 py-1 rounded text-xs text-white/50 hover:text-white disabled:opacity-20"
-                >
-                  ↓
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  {({ attributes, listeners }) => (
+                    <>
+                      <div className="flex items-center gap-2">
+                        <span
+                          {...attributes}
+                          {...listeners}
+                          className="cursor-grab active:cursor-grabbing text-white/30 hover:text-white/60 select-none touch-none"
+                          aria-label="Drag to reorder"
+                        >
+                          ⠿
+                        </span>
+                        <span className="text-sm text-white/80">{CATEGORY_LABELS[cat]}</span>
+                      </div>
+                    </>
+                  )}
+                </SortableRow>
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       </section>
 
       {/* Per-category project order */}
       {categoryOrder.map((cat) => (
         <section key={cat} className="glass rounded-2xl p-5 border border-white/8 mb-6">
           <h2 className="text-sm font-semibold text-white mb-3">{CATEGORY_LABELS[cat]}</h2>
-          <ul className="space-y-1.5">
-            {namesByCategory[cat].map((name, i) => {
-              const isHidden = overrides[name]?.hidden === true;
-              const isEditing = editingProject === name;
+          <DndContext
+            sensors={dndSensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(e) => handleProjectDragEnd(cat, e)}
+          >
+            <SortableContext items={namesByCategory[cat]} strategy={verticalListSortingStrategy}>
+              <ul className="space-y-1.5">
+                {namesByCategory[cat].map((name) => {
+                  const isHidden = overrides[name]?.hidden === true;
+                  const isEditing = editingProject === name;
 
-              return (
-                <li
-                  key={name}
-                  className={`rounded-lg bg-white/5 border border-white/8 ${isHidden ? "opacity-40" : ""}`}
-                >
-                  <div className="flex items-center justify-between px-3 py-2">
-                    <span className="text-sm text-white/70">
-                      {name}
-                      {isHidden && <span className="ml-2 text-[10px] text-white/30">(hidden)</span>}
-                    </span>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => {
-                          if (isEditing) {
-                            setEditingProject(null);
-                            setEditForm(null);
-                          } else {
-                            handleStartEdit(name);
-                          }
-                        }}
-                        className="px-2 py-1 rounded text-xs text-white/50 hover:text-white"
-                      >
-                        {isEditing ? "Cancel" : "Edit"}
-                      </button>
-                      <button
-                        onClick={() => handleToggleHide(name)}
-                        className="px-2 py-1 rounded text-xs text-white/50 hover:text-white"
-                      >
-                        {isHidden ? "Show" : "Hide"}
-                      </button>
-                      <button
-                        onClick={() =>
-                          setNamesByCategory((s) => ({ ...s, [cat]: move(s[cat], i, -1) }))
-                        }
-                        disabled={i === 0}
-                        className="px-2 py-1 rounded text-xs text-white/50 hover:text-white disabled:opacity-20"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        onClick={() =>
-                          setNamesByCategory((s) => ({ ...s, [cat]: move(s[cat], i, 1) }))
-                        }
-                        disabled={i === namesByCategory[cat].length - 1}
-                        className="px-2 py-1 rounded text-xs text-white/50 hover:text-white disabled:opacity-20"
-                      >
-                        ↓
-                      </button>
-                    </div>
-                  </div>
+                  return (
+                    <SortableRow
+                      key={name}
+                      id={name}
+                      className={`rounded-lg bg-white/5 border border-white/8 ${isHidden ? "opacity-40" : ""}`}
+                    >
+                      {({ attributes, listeners }) => (
+                        <>
+                          <div className="flex items-center justify-between px-3 py-2">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span
+                                {...attributes}
+                                {...listeners}
+                                className="cursor-grab active:cursor-grabbing text-white/30 hover:text-white/60 select-none touch-none shrink-0"
+                                aria-label="Drag to reorder"
+                              >
+                                ⠿
+                              </span>
+                              <span className="text-sm text-white/70 truncate">
+                                {name}
+                                {isHidden && <span className="ml-2 text-[10px] text-white/30">(hidden)</span>}
+                              </span>
+                            </div>
+                            <div className="flex gap-1 shrink-0">
+                              <button
+                                onClick={() => {
+                                  if (isEditing) {
+                                    setEditingProject(null);
+                                    setEditForm(null);
+                                  } else {
+                                    handleStartEdit(name);
+                                  }
+                                }}
+                                className="px-2 py-1 rounded text-xs text-white/50 hover:text-white"
+                              >
+                                {isEditing ? "Cancel" : "Edit"}
+                              </button>
+                              <button
+                                onClick={() => handleToggleHide(name)}
+                                className="px-2 py-1 rounded text-xs text-white/50 hover:text-white"
+                              >
+                                {isHidden ? "Show" : "Hide"}
+                              </button>
+                            </div>
+                          </div>
 
-                  {isEditing && editForm && (
+                          {isEditing && editForm && (
                     <div className="px-3 pb-3 pt-1 space-y-2 border-t border-white/8">
                       <div>
                         <label className="block text-[10px] text-white/40 mb-1">Short description</label>
@@ -787,12 +854,16 @@ export default function AdjustProjectsPage() {
                           <p className="text-[10px] text-white/50">{rowMessage.text}</p>
                         )}
                       </div>
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </SortableRow>
+                  );
+                })}
+              </ul>
+            </SortableContext>
+          </DndContext>
         </section>
       ))}
 
