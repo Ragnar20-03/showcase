@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { stagger, fadeUp } from "@/lib/animations";
+import { defaultHeroStats, type HeroStat } from "@/lib/hero-stats-data";
 
 const roles = [
   "Forward Deployed Engineer",
@@ -10,13 +11,6 @@ const roles = [
   "Salesforce Developer",
   "AI Integration Engineer",
   "AI Agent Builder",
-];
-
-const stats = [
-  { value: "63+", label: "GitHub Repos" },
-  { value: "300+", label: "LeetCode Solved" },
-  { value: "10+", label: "Web3 Projects" },
-  { value: "Ninja", label: "Dominator — CN" },
 ];
 
 function TypingText({ texts }: { texts: string[] }) {
@@ -29,7 +23,10 @@ function TypingText({ texts }: { texts: string[] }) {
     let timeout: ReturnType<typeof setTimeout>;
 
     if (!deleting && displayed.length < current.length) {
-      timeout = setTimeout(() => setDisplayed(current.slice(0, displayed.length + 1)), 60);
+      timeout = setTimeout(
+        () => setDisplayed(current.slice(0, displayed.length + 1)),
+        60
+      );
     } else if (!deleting && displayed.length === current.length) {
       timeout = setTimeout(() => setDeleting(true), 2000);
     } else if (deleting && displayed.length > 0) {
@@ -52,7 +49,7 @@ function TypingText({ texts }: { texts: string[] }) {
   );
 }
 
-export default function Hero() {
+export default function Hero({ stats = defaultHeroStats }: { stats?: HeroStat[] }) {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4 pt-28 pb-20">
       {/* Background glow orbs */}
@@ -87,26 +84,38 @@ export default function Hero() {
         </motion.div>
 
         {/* Name */}
-        <motion.h1 variants={fadeUp} className="text-5xl sm:text-7xl font-black tracking-tight text-white mb-4 leading-none">
+        <motion.h1
+          variants={fadeUp}
+          className="text-5xl sm:text-7xl font-black tracking-tight text-white mb-4 leading-none"
+        >
           Roshan Patil
         </motion.h1>
 
         {/* Typing role */}
-        <motion.div variants={fadeUp} className="text-2xl sm:text-4xl font-bold mb-6 h-12 flex items-center justify-center">
+        <motion.div
+          variants={fadeUp}
+          className="text-2xl sm:text-4xl font-bold mb-6 h-12 flex items-center justify-center"
+        >
           <TypingText texts={roles} />
         </motion.div>
 
         {/* Tagline */}
-        <motion.p variants={fadeUp} className="text-base sm:text-lg text-white/40 max-w-xl mx-auto mb-10 leading-relaxed">
+        <motion.p
+          variants={fadeUp}
+          className="text-base sm:text-lg text-white/40 max-w-xl mx-auto mb-10 leading-relaxed"
+        >
           Salesforce Developer turned AI Engineer. Building intelligent agents,
           RAG pipelines, and AI-powered Salesforce solutions — targeting{" "}
           <span className="text-violet-400">FDE</span> and{" "}
-          <span className="text-blue-400">Salesforce</span>{" "}+{" "}
+          <span className="text-blue-400">Salesforce</span> +{" "}
           <span className="text-violet-400">AI</span> roles.
         </motion.p>
 
         {/* CTAs */}
-        <motion.div variants={fadeUp} className="flex flex-wrap gap-4 justify-center mb-20">
+        <motion.div
+          variants={fadeUp}
+          className="flex flex-wrap gap-4 justify-center mb-20"
+        >
           <a
             href="#projects"
             className="px-7 py-3 rounded-xl font-semibold text-sm bg-linear-to-r from-violet-600 to-blue-600 hover:from-violet-500 hover:to-blue-500 text-white shadow-lg shadow-violet-900/30 hover:shadow-violet-900/50 transition-all duration-300 hover:-translate-y-0.5"
@@ -124,9 +133,15 @@ export default function Hero() {
         </motion.div>
 
         {/* Stats */}
-        <motion.div variants={fadeUp} className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
-          {stats.map((s) => (
-            <div key={s.label} className="glass rounded-2xl p-4 border border-white/5">
+        <motion.div
+          variants={fadeUp}
+          className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto"
+        >
+          {stats.map((s, i) => (
+            <div
+              key={`${s.label}-${i}`}
+              className="glass rounded-2xl p-4 border border-white/5"
+            >
               <div className="text-2xl font-black gradient-text">{s.value}</div>
               <div className="text-xs text-white/40 mt-0.5">{s.label}</div>
             </div>

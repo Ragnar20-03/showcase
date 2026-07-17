@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CATEGORIES, CATEGORY_LABELS, type Project, type ProjectCategory } from "@/lib/projects-data";
 import type { ProjectOrder } from "@/lib/project-order";
 import type { ProjectOverrideFields } from "@/lib/project-overrides";
+import type { HeroStatDoc } from "@/lib/hero-stats-store";
 
 type OrderResponse = {
   projects: Project[];
@@ -97,6 +98,82 @@ export default function AdjustProjectsPage() {
   const [addingProject, setAddingProject] = useState(false);
   const [addMessage, setAddMessage] = useState("");
 
+  const [heroStats, setHeroStats] = useState<HeroStatDoc[]>([]);
+  const [newHeroStat, setNewHeroStat] = useState({ value: "", label: "" });
+  const [addingHeroStat, setAddingHeroStat] = useState(false);
+  const [heroStatMessage, setHeroStatMessage] = useState("");
+  const [editingHeroStatId, setEditingHeroStatId] = useState<string | null>(null);
+  const [editHeroStatForm, setEditHeroStatForm] = useState({ value: "", label: "" });
+  const [savingHeroStat, setSavingHeroStat] = useState(false);
+
+  async function refreshHeroStats() {
+    const res = await fetch("/api/my-home/hero-stats");
+    const data: { stats: HeroStatDoc[] } = await res.json();
+    setHeroStats(data.stats);
+  }
+
+  async function handleAddHeroStat(e: React.FormEvent) {
+    e.preventDefault();
+    setAddingHeroStat(true);
+    setHeroStatMessage("");
+
+    const res = await fetch("/api/my-home/hero-stats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(newHeroStat),
+    });
+    const data = await res.json().catch(() => ({}));
+
+    setAddingHeroStat(false);
+
+    if (!res.ok) {
+      setHeroStatMessage(data.error ?? "Failed to add stat");
+      return;
+    }
+
+    setNewHeroStat({ value: "", label: "" });
+    await refreshHeroStats();
+  }
+
+  function handleStartEditHeroStat(stat: HeroStatDoc) {
+    setEditingHeroStatId(stat.id);
+    setEditHeroStatForm({ value: stat.value, label: stat.label });
+    setHeroStatMessage("");
+  }
+
+  async function handleSaveEditHeroStat(id: string) {
+    setSavingHeroStat(true);
+
+    const res = await fetch(`/api/my-home/hero-stats/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editHeroStatForm),
+    });
+    const data = await res.json().catch(() => ({}));
+
+    setSavingHeroStat(false);
+
+    if (!res.ok) {
+      setHeroStatMessage(data.error ?? "Failed to save");
+      return;
+    }
+
+    setEditingHeroStatId(null);
+    await refreshHeroStats();
+  }
+
+  async function handleDeleteHeroStat(id: string) {
+    const res = await fetch(`/api/my-home/hero-stats/${id}`, { method: "DELETE" });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      setHeroStatMessage(data.error ?? "Failed to delete");
+      return;
+    }
+
+    await refreshHeroStats();
+  }
+
   async function refreshOrder() {
     const res = await fetch("/api/my-home/order");
     const data: OrderResponse = await res.json();
@@ -119,6 +196,14 @@ export default function AdjustProjectsPage() {
         setProjectsByName(nextProjects);
         setOverrides(nextOverrides);
         setLoading(false);
+      });
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/my-home/hero-stats")
+      .then((res) => res.json())
+      .then((data: { stats: HeroStatDoc[] }) => {
+        setHeroStats(data.stats);
       });
   }, []);
 
@@ -306,6 +391,117 @@ export default function AdjustProjectsPage() {
         </button>
         {syncMessage && <p className="text-xs text-white/50">{syncMessage}</p>}
       </div>
+
+      {/* Hero stats */}
+      <section className="glass rounded-2xl p-5 border border-white/8 mb-6">
+        <h2 className="text-sm font-semibold text-white mb-3">Hero stats (top of homepage)</h2>
+
+        <ul className="space-y-1.5 mb-4">
+          {heroStats.map((stat) => {
+            const isEditing = editingHeroStatId === stat.id;
+            return (
+              <li
+                key={stat.id}
+                className="rounded-lg bg-white/5 border border-white/8"
+              >
+                <div className="flex items-center justify-between px-3 py-2">
+                  <span className="text-sm text-white/70">
+                    <span className="font-bold text-white">{stat.value}</span>{" "}
+                    <span className="text-white/40">— {stat.label}</span>
+                  </span>
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => {
+                        if (isEditing) {
+                          setEditingHeroStatId(null);
+                        } else {
+                          handleStartEditHeroStat(stat);
+                        }
+                      }}
+                      className="px-2 py-1 rounded text-xs text-white/50 hover:text-white"
+                    >
+                      {isEditing ? "Cancel" : "Edit"}
+                    </button>
+                    <button
+                      onClick={() => handleDeleteHeroStat(stat.id)}
+                      className="px-2 py-1 rounded text-xs text-white/50 hover:text-red-400"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+
+                {isEditing && (
+                  <div className="px-3 pb-3 pt-1 flex flex-wrap items-end gap-2 border-t border-white/8">
+                    <div>
+                      <label className="block text-[10px] text-white/40 mb-1">Value</label>
+                      <input
+                        type="text"
+                        value={editHeroStatForm.value}
+                        onChange={(e) =>
+                          setEditHeroStatForm((f) => ({ ...f, value: e.target.value }))
+                        }
+                        className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-white/40 mb-1">Label</label>
+                      <input
+                        type="text"
+                        value={editHeroStatForm.label}
+                        onChange={(e) =>
+                          setEditHeroStatForm((f) => ({ ...f, label: e.target.value }))
+                        }
+                        className="px-2.5 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-xs focus:outline-none focus:border-violet-500/50"
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleSaveEditHeroStat(stat.id)}
+                      disabled={savingHeroStat}
+                      className="px-4 py-1.5 rounded-lg font-semibold text-xs bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200 disabled:opacity-50"
+                    >
+                      {savingHeroStat ? "Saving…" : "Save"}
+                    </button>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
+        <form onSubmit={handleAddHeroStat} className="flex flex-wrap items-end gap-2">
+          <div>
+            <label className="block text-xs text-white/40 mb-1">Value</label>
+            <input
+              type="text"
+              required
+              value={newHeroStat.value}
+              onChange={(e) => setNewHeroStat((s) => ({ ...s, value: e.target.value }))}
+              placeholder="15+"
+              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-white/40 mb-1">Label</label>
+            <input
+              type="text"
+              required
+              value={newHeroStat.label}
+              onChange={(e) => setNewHeroStat((s) => ({ ...s, label: e.target.value }))}
+              placeholder="AI Projects"
+              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-violet-500/50"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={addingHeroStat}
+            className="px-5 py-2 rounded-xl font-semibold text-sm bg-violet-600 hover:bg-violet-500 text-white transition-all duration-200 disabled:opacity-50"
+          >
+            {addingHeroStat ? "Adding…" : "Add stat"}
+          </button>
+          {heroStatMessage && <p className="text-xs text-white/50">{heroStatMessage}</p>}
+        </form>
+      </section>
 
       {/* Add project manually */}
       <section className="glass rounded-2xl p-5 border border-white/8 mb-6">
